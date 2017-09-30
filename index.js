@@ -14,8 +14,19 @@ var loggers = {
   },
   info: console.log,
   debug: function(message) {
-    console.log('[debug] ' + message)
+    console.log('[debug] ' + format.call(this, message))
   },
+}
+
+function format(value) {
+  if (typeof value === 'string') {
+    return value
+  }
+  var string = this.format(value)
+  if (~string.indexOf('\n')) {
+    return '\n  ' + string.split('\n').join('\n  ')
+  }
+  return string
 }
 
 var timber = function(message) {
@@ -23,8 +34,8 @@ var timber = function(message) {
 }
 
 Object.keys(levels).forEach(function(key) {
-  timber[key] = function(arg) {
-    loggers[key](arg)
+  timber[key] = function() {
+    loggers[key].call(this, arguments[0])
   }
 })
 

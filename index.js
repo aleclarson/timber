@@ -14,11 +14,34 @@ var loggers = {
   },
   info: console.log,
   debug: function(message) {
-    console.log('[debug] ' + message)
+    console.log('[debug] ' + format.call(this, message))
   },
 }
 
-exports.set = function(methods) {
+function format(value) {
+  if (typeof value === 'string') {
+    return value
+  }
+  var string = this.format(value)
+  if (~string.indexOf('\n')) {
+    return '\n  ' + string.split('\n').join('\n  ')
+  }
+  return string
+}
+
+var timber = function(message) {
+  loggers.info(message)
+}
+
+Object.keys(levels).forEach(function(key) {
+  timber[key] = function() {
+    loggers[key].call(this, arguments[0])
+  }
+})
+
+timber.format = JSON.stringify
+
+timber.set = function(methods) {
   if (typeof methods === 'function') {
     var master = methods
     return Object.keys(levels).forEach(function(key) {
@@ -34,17 +57,22 @@ exports.set = function(methods) {
   }
 }
 
-exports.create = function(maxLevel) {
+timber.create = function(maxLevel) {
   function log(message) {
     log.info(message)
   }
 
+  log.level = maxLevel
+  log.format = timber.format
+
   if (maxLevel === null) {
+    log.level = null
     for (var key in levels) {
       log[key] = Function.prototype
     }
   } else {
-    maxLevel = levels[maxLevel || defaultLevel]
+    log.level = maxLevel || defaultLevel
+    maxLevel = levels[log.level]
     for (var key in levels) {
       if (levels[key] <= maxLevel) {
         log[key] = loggers[key]
@@ -54,5 +82,8 @@ exports.create = function(maxLevel) {
     }
   }
 
+  log.format = timber.format
   return log
 }
+
+module.exports = timber

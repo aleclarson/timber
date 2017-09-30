@@ -50,11 +50,13 @@ timber.create = function(maxLevel) {
   }
 
   if (maxLevel === null) {
+    log.level = null
     for (var key in levels) {
       log[key] = Function.prototype
     }
   } else {
-    maxLevel = levels[maxLevel || defaultLevel]
+    log.level = maxLevel || defaultLevel
+    maxLevel = levels[log.level]
     for (var key in levels) {
       if (levels[key] <= maxLevel) {
         log[key] = loggers[key]

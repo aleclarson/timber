@@ -18,7 +18,17 @@ var loggers = {
   },
 }
 
-exports.set = function(methods) {
+var timber = function(message) {
+  loggers.info(message)
+}
+
+Object.keys(levels).forEach(function(key) {
+  timber[key] = function(arg) {
+    loggers[key](arg)
+  }
+})
+
+timber.set = function(methods) {
   if (typeof methods === 'function') {
     var master = methods
     return Object.keys(levels).forEach(function(key) {
@@ -34,7 +44,7 @@ exports.set = function(methods) {
   }
 }
 
-exports.create = function(maxLevel) {
+timber.create = function(maxLevel) {
   function log(message) {
     log.info(message)
   }
@@ -56,3 +66,5 @@ exports.create = function(maxLevel) {
 
   return log
 }
+
+module.exports = timber

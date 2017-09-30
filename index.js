@@ -28,6 +28,8 @@ Object.keys(levels).forEach(function(key) {
   }
 })
 
+timber.format = JSON.stringify
+
 timber.set = function(methods) {
   if (typeof methods === 'function') {
     var master = methods
@@ -66,6 +68,7 @@ timber.create = function(maxLevel) {
     }
   }
 
+  log.format = timber.format
   return log
 }
 

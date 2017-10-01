@@ -15,9 +15,12 @@ exports.errors = function(formatter) {
 
 // Tags a message with a leading string
 exports.tags = function(tags) {
+  var newlineRE = /\n/g
   return function(level, message) {
     var tag = tags[level]
-    if (tag) return tag + message
+    if (tag) {
+      return tag + message.replace(newlineRE, '\n' + tag)
+    }
   }
 }
 
@@ -52,19 +55,10 @@ exports.ln = function() {
 exports.format = function(formatter) {
   var timber = this
   timber.format = formatter || JSON.stringify
-  function format(value, formatter) {
-    if (typeof value === 'string') {
-      return value
-    }
-    var string = formatter(value)
-    if (~string.indexOf('\n')) {
-      return '\n  ' + string.split('\n').join('\n  ')
-    }
-    return string
-  }
   return function(level, message) {
     if (level === 'debug') {
-      return format(message, this.format || timber.format)
+      if (typeof message === 'string') return message
+      return (this.format || timber.format)(message)
     }
   }
 }

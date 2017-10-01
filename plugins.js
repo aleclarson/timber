@@ -15,9 +15,12 @@ exports.errors = function(formatter) {
 
 // Tags a message with a leading string
 exports.tags = function(tags) {
+  var newlineRE = /\n/g
   return function(level, message) {
     var tag = tags[level]
-    if (tag) return tag + message
+    if (tag) {
+      return tag + message.replace(newlineRE, '\n' + tag)
+    }
   }
 }
 

@@ -1,5 +1,5 @@
 
-# timber v1.1.0
+# timber v1.2.0
 
 ```js
 var timber = require('timber')
